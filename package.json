@@ -1,0 +1,29 @@
+{
+  "name": "nw-testing",
+  "version": "0.0.0",
+  "description": "",
+  "main": "web/index.html",
+  "scripts": {
+    "start": "web/index.html"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "dependencies": {},
+  "window": {
+    "title": "node-webkit demo",
+    "icon": "icon.png",
+    "toolbar": false,
+    "frame": true,
+    "width": 1000,
+    "min_width": 500,
+    "height": 800,
+    "min_height": 500,
+    "position": "center",
+    "resizable": false
+  },
+  "devDependencies": {
+    "vinyl-source-stream": "~0.1.1",
+    "gulp": "~3.8.7",
+    "browserify": "~5.11.0"
+  }
+}
