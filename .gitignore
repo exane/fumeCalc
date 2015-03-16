@@ -2,3 +2,6 @@
 node_modules
 osx
 windows
+web/standalone
+web/standalone/db.conf.php
+web/standalone/build
