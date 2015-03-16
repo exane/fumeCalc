@@ -30,6 +30,7 @@ var UI = (function(){
       this._field.addClass("hidden");
       this._field.removeClass("show");
     }
+    this._handleTableHeight();
   }
 
   r.init = function(){
@@ -293,7 +294,11 @@ var UI = (function(){
 
   r._handleTableHeight = function() {
     var windowHeight = $(window).height();
-    this._dataWrapper.height(windowHeight - 100);
+    var delta = 100;
+    if(!this._isFieldHidden()){
+      delta += 336;
+    }
+    this._dataWrapper.height(windowHeight - delta);
   }
 
 
