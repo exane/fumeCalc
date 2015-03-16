@@ -34,6 +34,7 @@ var UI = (function(){
 
   r.init = function(){
     this._addButton = $("#addButton");
+    this._refreshBtn = $("#refreshButton");
     this._cancelButton = $("#cancelButton");
     this._saveButton = $("#saveButton");
     this._field = $("#addField");
@@ -41,8 +42,11 @@ var UI = (function(){
     this._amountField = $("#betrag");
     this._noteField = $("#bemerkung");
     this._dateEditField = $("#customDate");
+    this._dataWrapper = $(".data-wrapper");
 
     this._db = new DB();
+
+    this._handleTableHeight();
 
     this._db.load(this.createTable, this.displayAccount);
 
@@ -55,6 +59,7 @@ var UI = (function(){
     this._addButton.click(function(e){
       self._onAddButtonClick.call(self, e);
     });
+    this._refreshBtn.click(this._onRefreshButtonClick.bind(this));
     this._cancelButton.click(function(e){
       self._onAddButtonClick.call(self, e);
     });
@@ -71,11 +76,22 @@ var UI = (function(){
     this._dateEditField.keyup(function(e){
       self._renderEntryPreview();
     });
+    $(window).on("resize", this._handleTableHeight.bind(this))
 
   }
 
   r._onAddButtonClick = function(e){
     this.toggleAddButton();
+  }
+
+  r._onRefreshButtonClick = function(e) {
+    this.emptyTable();
+    this.createTable();
+  }
+
+  r.emptyTable = function() {
+    this._dataTable.empty();
+    this._db.load(this.createTable, this.displayAccount);
   }
 
   r._onSaveButtonClick = function(e){
@@ -238,7 +254,6 @@ var UI = (function(){
     return res;
   }
 
-
   r._renderEntryPreview = function(){
     var table = $("#entryPreview");
     var tmp = this.removePointAndComma(this._amountField.val());
@@ -274,6 +289,11 @@ var UI = (function(){
 
   r.doItRedIfNecessary = function(input){
     return input * 1 >= 0 ? input + "€" : "<span class='red'>" + input + "€</span>";
+  }
+
+  r._handleTableHeight = function() {
+    var windowHeight = $(window).height();
+    this._dataWrapper.height(windowHeight - 100);
   }
 
 

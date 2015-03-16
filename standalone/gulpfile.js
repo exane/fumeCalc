@@ -25,15 +25,15 @@ gulp.task('browserify', function(){
 });
 
 gulp.task('sass', function(){
-  gulp.src('./scss/*.scss')
-  .pipe(sass({
+  gulp.src('./css/*.css')
+  /*.pipe(sass({
     outputStyle: 'compressed'
   }).on("error", function(err){
     console.log(err);
-  }))
-  .pipe(gulp.dest('./public/assets/css/').on("error", function(err){
+  }))*/
+  /*.pipe(gulp.dest('./public/assets/css/').on("error", function(err){
     console.log(err);
-  }))
+  }))*/
   .pipe(livereload().on("error", function(err){
     console.log(err);
   }));
@@ -41,6 +41,7 @@ gulp.task('sass', function(){
 
 gulp.task("watch", function(){
   gulp.watch("./js/*", ["browserify"]);
+  gulp.watch("./css/*", ["sass"]);
 })
 
-gulp.task("default", ["watch", "browserify"]);
+gulp.task("default", ["watch", "browserify", "sass"]);

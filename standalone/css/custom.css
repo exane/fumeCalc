@@ -11,6 +11,13 @@
 
 .scrollable {
 }
+.data-wrapper {
+  overflow-y: scroll;
+}
+
+.container {
+
+}
 
 .alert {
     display: none;
