@@ -191,6 +191,7 @@ var UI = (function(){
     r._currentAccount = null;
     r._amountField = null;
     r._noteField = null;
+    r._dateEditField = null;
 
 
     r.toggleAddButton = function(){
@@ -212,6 +213,7 @@ var UI = (function(){
         this._dataTable = $("#dataEntries");
         this._amountField = $("#betrag");
         this._noteField = $("#bemerkung");
+        this._dateEditField = $("#customDate");
 
         this._db = new DB();
 
@@ -237,6 +239,9 @@ var UI = (function(){
             self._renderEntryPreview();
         });
         this._noteField.keyup(function(e){
+            self._renderEntryPreview();
+        });
+        this._dateEditField.keyup(function(e){
             self._renderEntryPreview();
         });
 
@@ -266,6 +271,7 @@ var UI = (function(){
     r.clearInputFields = function(){
         this._amountField.val("");
         this._noteField.val("");
+        this._dateEditField.val("");
     }
 
     r.displaySuccessAlert = function(){
@@ -347,7 +353,6 @@ var UI = (function(){
 
     r.parseSaveObj = function(){
         var tmp = this.removePointAndComma(this._amountField.val());
-        //var amount = this._amountField.val() * 100 | 0;
         var amount = tmp*1;
         var note = this._noteField.val();
 
@@ -357,8 +362,15 @@ var UI = (function(){
         m = date.getMonth() + 1;
         y = date.getFullYear();
 
+        date = d + "." + m + "." + y;
+
+
+        if(this._dateEditField.val() !== ""){
+            date = this._dateEditField.val();
+        }
+
         var obj = {
-            "date": d + "." + m + "." + y,
+            "date": date,
             "before": this._currentAccount,
             "deduction": amount,
             "after": (this._currentAccount + amount),
@@ -415,12 +427,16 @@ var UI = (function(){
         //val = this._amountField.val() * 100 | 0;
         val = tmp*1;
 
+        date = d + "." + m + "." + y;
+        if(this._dateEditField.val() !== ""){
+            date = this._dateEditField.val();
+        }
 
         sum = (this._currentAccount + val);
 
         table.html(
             "<tr>" +
-                "<td>" + d + "." + m + "." + y + "</td>" +
+                "<td>" + date + "</td>" +
                 "<td>" + this.doItRedIfNecessary(this._currentAccount / 100) + "</td>" +
                 "<td>" + this.doItRedIfNecessary(val / 100) + "</td>" +
                 "<td>" + this.doItRedIfNecessary(sum / 100) + "</td>" +

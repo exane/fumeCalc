@@ -1,0 +1,17 @@
+.badge {
+    /*
+    background-color: rgb(126, 255, 188);
+    color: #000000;
+    */
+}
+
+.red {
+    color: red;
+}
+
+.scrollable {
+}
+
+.alert {
+    display: none;
+}

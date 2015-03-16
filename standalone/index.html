@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>fumeCalc</title>
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <meta charset="utf-8">
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    <br>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div id="saveSuccessAlert" class="alert alert-success">
+        <strong class="">Gespeichert!</strong>
+      </div>
+      <div id="saveWarningAlert" class="alert alert-danger">
+        <strong class=""></strong>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="col-lg-6 pull-left">
+        <div class="well well-sm center-block">
+          Guthaben <span class="badge"><span class="value">0</span>&euro;</span>
+        </div>
+      </div>
+      <div class="col-lg-6 pull-right">
+        <div id="addButton" class="btn btn-primary">
+          hinzuf&uuml;gen
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="addField" class="row hidden">
+    <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel panel-heading">
+          Neuer Eintrag
+        </div>
+        <div class="panel panel-body">
+          <div class="row">
+            <div class="col-lg-12">
+              <table class="table table-bordered">
+                <thead>
+                <tr>
+                  <th>Datum</th>
+                  <th>Aktuell</th>
+                  <th>Betrag</th>
+                  <th>Endsumme</th>
+                  <th>Bemerkung</th>
+                </tr>
+                </thead>
+                <tbody id="entryPreview">
+                <tr>
+                  <td class="editable">0</td>
+                  <td>0&euro;</td>
+                  <td>0&euro;</td>
+                  <td>0&euro;</td>
+                  <td></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="row">
+                <div class="col-sm-4 form-group">
+                  <label for="betrag">Betrag</label>
+                  <br>
+                  <input id="betrag" type="text">
+                </div>
+                <div class="col-sm-4 form-group">
+                  <label for="bemerkung">Bemerkung</label>
+                  <br>
+                  <input id="bemerkung" type="text">
+                </div>
+                <div class="col-sm-4 form-group">
+                  <label for="customDate">Custom Date</label>
+                  <br>
+                  <input id="customDate" type="text">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div id="saveButton" class="btn btn-primary">
+                    Speichern
+                  </div>
+                  <div id="cancelButton" class="btn btn-warning">
+                    Abbrechen
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12 scrollable">
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th>Datum</th>
+          <th>Vorher</th>
+          <th>Betrag</th>
+          <th>Endsumme</th>
+          <th>Bemerkung</th>
+        </tr>
+        </thead>
+        <tbody id="dataEntries">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+<script src="build/bundle.js"></script>
+</html>
