@@ -8,15 +8,18 @@
     static public $db;
     static public function save($obj) {
       $sql = "insert into fumecalc_history
-              (date, account_before, deduction, after, note, history_id)
-              values(:date, :before, :deduc, :after, :note, 1)";
+              (date, account_before, deduction, after, note, fees, client, signed, history_id)
+              values(:date, :before, :deduc, :after, :note, :fees, :client, :signed, 1)";
       $query = DB::$db->prepare($sql);
       $query->execute([":date" => $obj["date"],
                        ":before" => $obj["before"],
                        ":deduc" => $obj["deduction"],
                        ":after" => $obj["after"],
+                       ":fees" => $obj["fees"],
+                       ":signed" => $obj["signed"],
+                       ":client" => $obj["client"],
                        ":note" => $obj["note"]]);
-      DB::changeAccountBy($obj["deduction"]);
+      DB::changeAccountBy($obj["deduction"] - $obj["fees"]);
     }
 
     static public function load() {

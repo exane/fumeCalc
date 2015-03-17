@@ -32,8 +32,11 @@ CREATE TABLE IF NOT EXISTS `fumecalc_history` (
   `date` text NOT NULL,
   `account_before` int(255) NOT NULL,
   `deduction` int(255) NOT NULL,
+  `fees` int NOT NULL, #gebühren
   `after` int(255) NOT NULL,
   `note` text NOT NULL,
+  `client` text NOT NULL, #kunde
+  `signed` text NOT NULL, #wer hats eingetragen
   `history_id` int(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=26 ;
