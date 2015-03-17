@@ -183,7 +183,7 @@ var UI = (function(){
     var self = root;
 
     for(var obj in data) {
-      //console.log(obj);
+  //console.log(obj);
       self._drawTable(data[obj]);
     }
   }

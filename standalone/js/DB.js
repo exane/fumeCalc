@@ -30,7 +30,6 @@ var DB = (function(){
     })
     .done(function(res){
       res = JSON.parse(res);
-      console.log(res);
       self._history = res.history;
       self._account = res.account;
       dataDB.call(self, self._history);
