@@ -21,7 +21,7 @@ var DB = (function(){
   r._account = null;
   r._historyAsArray = null;
 
-  r.load = function(dataDB, accountCB) {
+  r.load = function(dataDB, accManager) {
     var self = this;
     $.ajax("php/ajaxController.php", {
       data: {
@@ -33,7 +33,8 @@ var DB = (function(){
       self._history = res.history;
       self._account = res.account;
       dataDB.call(self, self._history);
-      accountCB.call(self, self._account);
+      //accountCB.call(self, self._account);
+      accManager.updateAccounts(res.account);
     });
   }
 

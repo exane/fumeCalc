@@ -30,7 +30,7 @@
     }
 
     static private function getAccount() {
-      $sql = "select * from fumecalc";
+      $sql = "select fume, tim, viktor from fumecalc";
       $query = DB::$db->prepare($sql);
       $query->execute();
 

@@ -1,10 +1,16 @@
 var $ = require("jquery");
 var DB = require("./DB.js");
+var Table = require("./Table");
+var AccManager = require("./AccountManager");
+var Preview = require("./TablePreview");
+var Helper = require("./Helper");
 
 
 var UI = (function(){
   var UI = function(){
     root = this;
+
+    this.AccManager = AccManager();
   }
   var r = UI.prototype;
   var root = null;
@@ -21,45 +27,59 @@ var UI = (function(){
   r._noteField = null;
   r._dateEditField = null;
 
+  r.AccManager = null;
 
-  r.toggleAddButton = function(){
-    if(this._isFieldHidden()){
-      this._field.addClass("show");
-      this._field.removeClass("hidden");
-    }
-    else {
-      this._field.addClass("hidden");
-      this._field.removeClass("show");
-    }
-    this._handleTableHeight();
+  r._onAddButtonClick = function(e){
+    this.toggleAddButton();
   }
 
-  r.init = function(){
-    this._addButton = $("#addButton");
-    this._refreshBtn = $("#refreshButton");
-    this._cancelButton = $("#cancelButton");
-    this._saveButton = $("#saveButton");
-    this._field = $("#addField");
-    this._dataTable = $("#dataEntries");
-    this._amountField = $("#betrag");
-    this._noteField = $("#bemerkung");
-    this._dateEditField = $("#customDate");
-    this._feesField = $("#gebühren");
-    this._clientField = $("#kunde");
-    this._usernameField = $("#username");
-    this._privateCheckbox = $("#checkboxPrivate");
-    this._dataWrapper = $(".data-wrapper");
+  r._onCheckBox = function(e){
+    //this._renderEntryPreview();
+    Preview();
+  }
 
-    this._usernameField.val(this.username());
+  r._onRefreshButtonClick = function(e){
+    this.emptyTable();
+    this.createTable();
+    this.AccManager.renderAll();
+  }
 
-    this._db = new DB();
+  r._onSaveButtonClick = function(e){
+    this.username(this._usernameField.val());
+    var data = Helper.parseSaveObj();
+    //var self = this;
+    if(!this.validateFields()){
+      return;
+    }
+    this.handlePrivateKonto(data);
+    this._db.save(data, function(err){
+      if(err){
+        self.displayWarningAlert(err);
+        return -1;
+      }
+      /*self.addNewEntry.call(self, data);*/
+      Table(data).add();
+      /*self.updateAccount.call(self, data);*/
+      //this.AccManager.updateAccounts(data.accounts);
+      this.displaySuccessAlert();
+      this.toggleAddButton();
+      this.clearInputFields();
+      //self._renderEntryPreview();
+      Preview(data);
+    }.bind(this));
+  }
 
-    this._handleTableHeight();
+  r._handleTableHeight = function(){
+    var windowHeight = $(window).height();
+    var delta = 100;
+    if(!this._isFieldHidden()){
+      delta += 336;
+    }
+    this._dataWrapper.height(windowHeight - delta);
+  }
 
-    this._db.load(this.createTable, this.displayAccount);
-
-
-    this._initEvents();
+  r._isFieldHidden = function(){
+    return this._field.hasClass("hidden");
   }
 
   r._initEvents = function(){
@@ -77,21 +97,76 @@ var UI = (function(){
     this._privateCheckbox.click(this._onCheckBox.bind(this));
 
     this._amountField.keyup(function(e){
-      self._renderEntryPreview();
+      //self._renderEntryPreview();
+      Preview();
     });
     this._noteField.keyup(function(e){
-      self._renderEntryPreview();
+      //self._renderEntryPreview();
+      Preview();
     });
     this._dateEditField.keyup(function(e){
-      self._renderEntryPreview();
+      //self._renderEntryPreview();
+      Preview();
     });
-    this._clientField.keyup(this._renderEntryPreview.bind(this));
-    this._feesField.keyup(this._renderEntryPreview.bind(this));
-    this._usernameField.keyup(function(e){
-      this._renderEntryPreview(e);
-    }.bind(this));
+    this._clientField.keyup(function(){
+      Preview();
+    });
+    this._feesField.keyup(function(){
+      Preview();
+    });
+    this._usernameField.keyup(function(){
+      Preview();
+    });
     $(window).on("resize", this._handleTableHeight.bind(this))
 
+  }
+
+  r.toggleAddButton = function(){
+    if(this._isFieldHidden()){
+      this._field.addClass("show");
+      this._field.removeClass("hidden");
+    }
+    else {
+      this._field.addClass("hidden");
+      this._field.removeClass("show");
+    }
+    this._handleTableHeight();
+    Preview();
+  }
+
+  r.init = function(){
+    this._addButton = $("#addButton");
+    this._refreshBtn = $("#refreshButton");
+    this._cancelButton = $("#cancelButton");
+    this._saveButton = $("#saveButton");
+    this._field = $("#addField");
+    /*
+        this._dataTable = $("#dataEntries");*/
+    this._amountField = $("#betrag");
+    this._noteField = $("#bemerkung");
+    this._dateEditField = $("#customDate");
+    this._feesField = $("#gebühren");
+    this._clientField = $("#kunde");
+    this._usernameField = $("#username");
+    this._privateCheckbox = $("#checkboxPrivate");
+    this._dataWrapper = $(".data-wrapper");
+
+    this._usernameField.val(this.username());
+
+    this._db = new DB();
+
+    this._handleTableHeight();
+
+    this.AccManager.add("Fume");
+    this.AccManager.add("Tim");
+    this.AccManager.add("Viktor");
+
+
+    this._db.load(this.createTable, this.AccManager);
+    Preview();
+
+
+    this._initEvents();
   }
 
   r.username = function(name){
@@ -99,47 +174,47 @@ var UI = (function(){
     return localStorage["fumecalc_name"] = $.trim(name.toLowerCase());
   }
 
-  r._onAddButtonClick = function(e){
-    this.toggleAddButton();
-  }
-
-  r._onCheckBox = function(e) {
-    this._renderEntryPreview();
-  }
-
-  r._onRefreshButtonClick = function(e){
-    this.emptyTable();
-    this.createTable();
+  r.getUsername = function(){
+    return $.trim(this._usernameField.val());
   }
 
   r.emptyTable = function(){
-    this._dataTable.empty();
-    this._db.load(this.createTable, this.displayAccount);
+    Table().removeAll();
+    this._db.load(this.createTable, this.AccManager);
   }
 
-  r._onSaveButtonClick = function(e){
-    this.username(this._usernameField.val());
-    var data = this.parseSaveObj();
-    var self = this;
-    if(!self.validateFields()) {
+  r.handlePrivateKonto = function(obj){
+    var accs = this.AccManager.get();
+    obj.accounts = this.AccManager.toFlatObj();
+    if(!Helper.isPrivate()){
+      accs["fume"].setVal(obj.after);
       return;
     }
-    this.handlePrivateKonto(data);
-    this._db.save(data, function(err){
-      if(err){
-        self.displayWarningAlert(err);
-        return -1;
-      }
-      self.addNewEntry.call(self, data);
-      self.updateAccount.call(self, data);
-      self.displaySuccessAlert.call(self);
-      self.toggleAddButton();
-      self.clearInputFields();
-      self._renderEntryPreview();
-    });
+    var user = obj.signed;
+    var otheruser = user === "tim" ? "viktor" : "tim";
+
+    //accs[user] += (obj.after - obj.before) / 2;
+    accs[user].changeVal((obj.after - obj.before) / 2);
+    //accs[otheruser] -= (obj.after - obj.before) / 2;
+    accs[otheruser].changeVal(-(obj.after - obj.before) / 2);
+
+    accs["fume"].setVal(obj.after);
+    obj.isPrivate = user;
+
+    obj.accounts = this.AccManager.toFlatObj();
+
   }
 
-  r.validateFields = function() {
+  r.createTable = function(data){
+    var self = root;
+
+    for(var obj in data) {
+      Table(data[obj]).add();
+    }
+
+  }
+
+  r.validateFields = function(){
     if(this.username() == "" || (this.username() != "tim" && this.username() != "viktor")){ //yo hardcoded
       console.error("Incorrect name. Are you not tim or viktor?");
       this.displayWarningAlert("Incorrect name. Are you not tim or viktor?");
@@ -167,202 +242,112 @@ var UI = (function(){
     sign.show(400).delay(8000).hide(300);
   }
 
-  r.updateAccount = function(data){
+  /*r.updateAccount = function(data){
     //var badge = $('[data-name="fume"]');
     for(var acc in this.getAccounts()) {
-      var badge = $('[data-name="'+acc+'"]');
+      var badge = $('[data-name="' + acc + '"]');
       badge.text(data.accounts[acc] / 100);
       this.getAccounts()[acc] = data.accounts[acc];
     }
-  }
+  }*/
+  /*
+    r.displayAccount = function(account){
+      var badge = $(".badge");
+      root._account.fume = parseInt(account.fume);
+      for(var acc in account) {
+        root._account[acc] = parseInt(account[acc])
+        badge.find('[data-name=' + acc + ']').text(root._account[acc] / 100);
+      }
+      root._renderEntryPreview()
+    }*/
 
-  r.displayAccount = function(account, only){
-    var badge = $(".badge");
-    only = only || false;
-    root._account.fume = parseInt(account.fume);
-    for(var acc in account) {
-      root._account[acc] = parseInt(account[acc])
-      badge.find('[data-name=' + acc + ']').text(root._account[acc] / 100);
-    }
-    if(only) return;
-    root._renderEntryPreview()
-  }
-
-  r.getAccounts = function() {
+  /*r.getAccounts = function(){
     return this._account;
-  }
-
-  r.addNewEntry = function(data){
-
-    var before = data.before >= 0 ? data.before / 100 + "&euro;" : "<span class='red'>" + data.before / 100 + "&euro;" + "</span>";
-    var deduction = data.deduction >= 0 ? data.deduction / 100 + "&euro;" : "<span class='red'>" + data.deduction / 100 + "&euro;" + "</span>";
-    var after = data.after >= 0 ? data.after / 100 + "&euro;" : "<span class='red'>" + data.after / 100 + "&euro;" + "</span>";
-
-    var table = $("<tr>" +
-    "<td>" + data.date + "</td>" +
-    "<td>" + before + "</td>" +
-    "<td>" + deduction + "</td>" +
-    "<td>" + data.fees / 100 + "&euro;</td>" +
-    "<td>" + after + "</td>" +
-    "<td>" + data.note + "</td>" +
-    "<td>" + data.client + "</td>" +
-    "<td>" + data.signed + "</td>" +
-    "</tr>");
-
-    if(data.isPrivate){
-      table.addClass("private-pay");
-    }
-    this._dataTable.prepend(table);
-  }
-
-  r._isFieldHidden = function(){
-    return this._field.hasClass("hidden");
-  }
+  }*/
 
   /**
    *
    * @param {DB} data
    */
-  r.createTable = function(data){
-    var self = root;
+  /*
+    r.parseSaveObj = function(){
+      var tmp = this.removePointAndComma(this._amountField.val());
+      var amount = tmp * 1;
+      var note = this._noteField.val();
 
-    for(var obj in data) {
-      //console.log(obj);
-      self._drawTable(data[obj]);
-    }
-  }
+      var date = new Date();
+      var d, m, y;
+      var fees, sum, fee;
+      d = date.getDate();
+      m = date.getMonth() + 1;
+      y = date.getFullYear();
 
-  r._drawTable = function(data){
+      date = d + "." + m + "." + y;
 
-    var before = data.account_before >= 0 ? data.account_before / 100 + "&euro;" : "<span class='red'>" + data.account_before / 100 + "&euro;" + "</span>";
-    var deduction = data.deduction >= 0 ? data.deduction / 100 + "&euro;" : "<span class='red'>" + data.deduction / 100 + "&euro;" + "</span>";
-    var after = data.after >= 0 ? data.after / 100 + "&euro;" : "<span class='red'>" + data.after / 100 + "&euro;" + "</span>";
-
-    //after = data.private*1 ? "(Privat)" : after;
-    var table = $("<tr>" +
-    "<td>" + data.date + "</td>" +
-    "<td>" + before + "</td>" +
-    "<td>" + deduction + "</td>" +
-    "<td>" + data.fees / 100 + "&euro;</td>" +
-    "<td>" + after + "</td>" +
-    "<td>" + data.note + "</td>" +
-    "<td>" + data.client + "</td>" +
-    "<td>" + data.signed + "</td>" +
-    "</tr>");
-
-    if(data.private*1){
-      table.addClass("private-pay");
-    }
-    this._dataTable.prepend(table);
-
-  }
-
-  r.parseSaveObj = function(){
-    var tmp = this.removePointAndComma(this._amountField.val());
-    var amount = tmp * 1;
-    var note = this._noteField.val();
-
-    var date = new Date();
-    var d, m, y;
-    var fees, sum, fee;
-    d = date.getDate();
-    m = date.getMonth() + 1;
-    y = date.getFullYear();
-
-    date = d + "." + m + "." + y;
-
-    fees = this.calcFees(amount, this._feesField.val());
-    sum = (this.getAccounts().fume + fees.sum);
-    fee = fees.fee;
+      fees = this.calcFees(amount, this._feesField.val());
+      sum = (this.getAccounts().fume + fees.sum);
+      fee = fees.fee;
 
 
 
-    if(this._dateEditField.val() !== ""){
-      date = this._dateEditField.val();
-    }
+      if(this._dateEditField.val() !== ""){
+        date = this._dateEditField.val();
+      }
 
 
-    var obj = {
-      "date": date,
-      "before": this.getAccounts().fume,
-      "deduction": amount,
-      "fees": fee,
-      "client": this._clientField.val(),
-      "signed": this.username(),
-      "after": sum,
-      "note": note,
-      "isPrivate": this.isPrivate()
+      var obj = {
+        "date": date,
+        "before": this.getAccounts().fume,
+        "deduction": amount,
+        "fees": fee,
+        "client": this._clientField.val(),
+        "signed": this.username(),
+        "after": sum,
+        "note": note,
+        "isPrivate": this.isPrivate()
+      }
+
+      return obj;
+    }*/
+  /*
+    r.isPrivate = function(){
+      return this._privateCheckbox.prop("checked");
+    }*/
+  /*
+
+    */
+  /*
+
+    r.removePointAndComma = function(input){
+      var n, a = [], res;
+
+      if(input.indexOf(",") > 0){
+        a = input.split(",");
+      }
+      else if(input.indexOf(".") > 0){
+        a = input.split(".");
+      }
+
+      else
+        return input + "00";
+
+      res = a[0];
+      res += root._trimDeci(a[1]);
+
+
+      return res;
     }
 
-    return obj;
-  }
-
-  r.getUsername = function() {
-    return $.trim(this._usernameField.val());
-  }
-
-  r.isPrivate = function() {
-    return this._privateCheckbox.prop("checked");
-  }
-
-  r.handlePrivateKonto = function(obj) {
-    var accs = this.getAccounts();
-    obj.accounts = accs;
-    if(!this.isPrivate()) {
-      accs["fume"] = obj.after;
-      return;
+    r._trimDeci = function(string){
+      var res = "";
+      res += (string[0] || "0") + (string[1] || "0");
+      return res;
     }
-    var user = obj.signed;
-    var otheruser = user === "tim" ? "viktor" : "tim";
+  */
 
-    accs[user] += (obj.after - obj.before)/2;
-    accs[otheruser] -= (obj.after - obj.before)/2;
-
-    accs["fume"] = obj.after;
-    obj.isPrivate = user;
-
-    obj.accounts = accs;
-
-  }
-
-  /**
-   * removePointAndComma
-   * @param {string} input
-   * @returns {*|void}
-   */
-  r.removePointAndComma = function(input){
-    var n, a = [], res;
-
-    if(input.indexOf(",") > 0){
-      a = input.split(",");
-    }
-    else if(input.indexOf(".") > 0){
-      a = input.split(".");
-    }
-
-    else
-      return input + "00";
-
-    res = a[0];
-    res += root._trimDeci(a[1]);
-
-
-    return res;
-  }
-
-  r._trimDeci = function(string){
-    var res = "";
-    res += (string[0] || "0") + (string[1] || "0");
-    return res;
-  }
-
-  r._renderEntryPreview = function(){
+  /*r._renderEntryPreview = function(){
     var table = $("#entryPreview");
     var obj = this.parseSaveObj();
-/*
-    var before = obj.isPrivate ? this.getAccounts()[this.getUsername()]: obj.before;
-    var after = obj.isPrivate ? this.getAccounts()[this.username()]+obj.deduction/2: obj.after;*/
-
 
     table.html(
     "<tr>" +
@@ -376,45 +361,36 @@ var UI = (function(){
     "<td>" + this._usernameField.val() + "</td>" +
     "</tr>"
     );
-  }
+  }*/
+  /*
+    r.calcFees = function(val, fees){
+      var textVal = "" + fees;
+      var regex = (/^([\d\.,]*)(.*)?/ig).exec(textVal);
+      var fee = this.removePointAndComma(regex[1]);
+      var type = $.trim(regex[2]) || "€";
+      var sum = null;
 
-  r.calcFees = function(val, fees){
-    var textVal = "" + fees;
-    var regex = (/^([\d\.,]*)(.*)?/ig).exec(textVal);
-    var fee = this.removePointAndComma(regex[1]);
-    var type = $.trim(regex[2]) || "€";
-    var sum = null;
-
-    if(type === "%"){
-      fee /= 100;
-      fee = parseInt(val * fee / 100);
-      //fee = parseInt(fee*100)/100;
-      fee = fee<0? fee*(-1):fee;
-      sum = val - fee;
-    }
-    if(type === "€"){
-      sum = val - fee;
-    }
+      if(type === "%"){
+        fee /= 100;
+        fee = parseInt(val * fee / 100);
+        //fee = parseInt(fee*100)/100;
+        fee = fee < 0 ? fee * (-1) : fee;
+        sum = val - fee;
+      }
+      if(type === "€"){
+        sum = val - fee;
+      }
 
 
-    return {
-      sum: sum,
-      fee: fee
-    };
-  }
-
-  r.doItRedIfNecessary = function(input){
-    return input * 1 >= 0 ? input + "€" : "<span class='red'>" + input + "€</span>";
-  }
-
-  r._handleTableHeight = function(){
-    var windowHeight = $(window).height();
-    var delta = 100;
-    if(!this._isFieldHidden()){
-      delta += 336;
-    }
-    this._dataWrapper.height(windowHeight - delta);
-  }
+      return {
+        sum: sum,
+        fee: fee
+      };
+    }*/
+  /*
+    r.doItRedIfNecessary = function(input){
+      return input * 1 >= 0 ? input + "€" : "<span class='red'>" + input + "€</span>";
+    }*/
 
 
   return UI;

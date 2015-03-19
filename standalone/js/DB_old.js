@@ -42,7 +42,6 @@ var DB = (function(){
 
         var history = {};
         var n = this._historyAsArray.push(saveObj);
-        var endfile = "";
 
         for(var i = 0; i < n; i++) {
             history[i] = this._historyAsArray[i];
