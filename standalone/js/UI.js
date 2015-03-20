@@ -1,10 +1,11 @@
-window.$ = require("jquery");
+window.$ = window.jQuery = require("jquery");
 var DB = require("./DB.js");
 var Table = require("./Table");
 var AccManager = require("./AccountManager");
 var Preview = require("./TablePreview");
 var Helper = require("./Helper");
-
+require("./jquery.tablesorter");
+require("./jquery.tablesorter.widgets");
 
 var UI = (function(){
   var UI = function(){
@@ -34,6 +35,7 @@ var UI = (function(){
   r._suppressAlert = false;
 
   r.AccManager = null;
+  r.tablesort = null;
 
   r._onAddButtonClick = function(e){
     this.toggleAddButton();
@@ -82,6 +84,12 @@ var UI = (function(){
       this._saved.resolve("saved");
     }.bind(this));
     return this._saved;
+  }
+
+  r._updateTableSort = function() {
+    $(document).on("tablesort/update", function() {
+      this.tablesort.trigger("updateAll", [true]);
+    }.bind(this));
   }
 
   r._onPayOutButton = function(){
@@ -207,6 +215,7 @@ var UI = (function(){
     this._payOutButton.click(this._onPayOutButton.bind(this));
     this._openPayOutButton.click(this._openPayOut.bind(this));
 
+    this._updateTableSort();
 
     this._amountField.keyup(function(e){
       //self._renderEntryPreview();
@@ -263,6 +272,15 @@ var UI = (function(){
     this._privateCheckbox = $("#checkboxPrivate");
     this._dataWrapper = $(".data-wrapper");
 
+    this.tablesort = $("#dataEntries").parent().tablesorter({
+      theme : 'metro-dark',
+      ignoreCase: true,
+      headerTemplate : '{content}{icon}',
+      headers: {
+        0: {sorter: "text"}
+      },
+      sortList: [[0, 1]]
+    });
 
     this._payOutButton = $("#btn-pay-out");
     this._openPayOutButton = $("#payoutButton");

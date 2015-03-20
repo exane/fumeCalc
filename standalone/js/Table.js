@@ -64,6 +64,8 @@ var Table = (function(){
       this._prepend(table);
     }
 
+    $(document).trigger("tablesort/update");
+
     return this;
   }
 

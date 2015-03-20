@@ -1,5 +1,6 @@
 var AccManager = require("./AccountManager");
 var $ = require("jquery");
+var moment = require("moment");
 
 var Helper = (function(){
   var Helper = {};
@@ -18,14 +19,15 @@ var Helper = (function(){
     var signed = $("#username").val();
 
 
-    var date = new Date();
     var d, m, y;
-    var fees, sum, fee, before;
+    var fees, sum, fee, before;/*
+    var date = new Date();
     d = date.getDate();
     m = date.getMonth() + 1;
     y = date.getFullYear();
 
-    date = d + "." + m + "." + y;
+    date = d + "." + m + "." + y;*/
+    var date = moment().format("DD.MM.YYYY, HH:mm");
 
     fees = this.calcFees(amount, $("#gebühren").val());
     sum = (this.AccManager.get("fume").getVal() + fees.sum);
@@ -42,6 +44,10 @@ var Helper = (function(){
 
     if($("#customDate").val() !== ""){
       date = $("#customDate").val();
+      date = moment(date, "DD.MM.YYYY").set({
+        "hour": moment().get("hour"),
+        "minute": moment().get("minute")
+      }).format("DD.MM.YYYY, HH:mm");
     }
 
 
