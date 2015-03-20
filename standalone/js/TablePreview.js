@@ -35,6 +35,7 @@ var TablePreview = (function(){
     if(!data.isPrivate) return;
     data.before = this.AccManager.get(data.signed).getVal();
     data.deduction /= 2;
+    data.deduction = Helper.accounting.toFixed(data.deduction, 0)*1;
     data.after = data.before + data.deduction;
     data.fees = 0;
   }

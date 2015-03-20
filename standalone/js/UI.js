@@ -95,6 +95,7 @@ var UI = (function(){
   r._onPayOutButton = function(){
     var amount = parseInt(this._payOutField.val()) * 100 || this.AccManager.get("fume").getVal();
     var tim, vik, obj, self = this;
+    var name = this.getUsername();
 
     if(amount > this.AccManager.get("fume").getVal()){
       this.displayWarningAlert("Input Error: number to large");
@@ -112,30 +113,6 @@ var UI = (function(){
     res.tim += (tim - vik);
     res.vik += (vik - tim);
 
-   /* self._preparePayOutFor("tim", res.tim);
-    self._saveButton.click();
-
-    this._suppressAlert = true;
-    $.when(self._saved)
-    .then(function(){
-      self._preparePayOutFor("viktor", res.vik)
-      self._saveButton.click();
-    })
-    .then(self._saved)
-    .then(function(){
-      self._preparePayOutFor("tim", res.tim, true)
-      self._saveButton.click();
-    })
-    .then(self._saved)
-    .then(function(){
-      self._preparePayOutFor("viktor", res.vik, true)
-      self._saveButton.click();
-      self._suppressAlert = false;
-    })
-    .then(self._saved)
-    .then(function() {
-      self._suppressAlert = false;
-    })*/
     var result = {};
     this._preparePayOutFor("tim", res.tim);
     result.tim_out = Helper.parseSaveObj();
@@ -158,6 +135,9 @@ var UI = (function(){
       for(var table in result) {
         Table(result[table]).add();
       }
+      self.clearInputFields();
+      self._usernameField.val(name)
+      Preview();
     });
 
   }
@@ -190,6 +170,7 @@ var UI = (function(){
   r._isFieldHidden = function(){
     return this._field.hasClass("hidden");
   }
+
   r._openPayOut = function() {
 
     this._payOutField.val(this.AccManager.get("fume").getVal()/100);
@@ -343,6 +324,8 @@ var UI = (function(){
     this._noteField.val("");
     this._dateEditField.val("");
     this._clientField.val("");
+
+    this._privateCheckbox.attr("checked", false);
   }
 
   r.displaySuccessAlert = function(){

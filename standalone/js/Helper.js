@@ -1,6 +1,7 @@
 var AccManager = require("./AccountManager");
 var $ = require("jquery");
 var moment = require("moment");
+var accounting = require("accounting");
 
 var Helper = (function(){
   var Helper = {};
@@ -11,22 +12,34 @@ var Helper = (function(){
    * r.getProperty = function() {...}
    */
   r.AccManager = AccManager();
+  r.accounting = (function() {
+    accounting.settings = {
+      currency: {
+        symbol : "€",   // default currency symbol is '$'
+        format: "%v%s", // controls output: %s = symbol, %v = value/number (can be object: see below)
+        decimal : ",",  // decimal point separator
+        thousand: ".",  // thousands separator
+        precision : 2   // decimal places
+      },
+      number: {
+        precision : 2,  // default precision on numbers is 0
+        thousand: ".",
+        decimal : ","
+      }
+    }
+    return accounting;
+  })();
 
   r.parseSaveObj = function(isPrivate = false){
     var tmp = this.removePointAndComma($("#betrag").val());
-    var amount = tmp * 1;
+    tmp = accounting.formatMoney(tmp);
+    //var amount = tmp * 1;
+    var amount = accounting.unformat(tmp);
     var note = $("#bemerkung").val();
     var signed = $("#username").val();
 
+    var fees, sum, fee, before;
 
-    var d, m, y;
-    var fees, sum, fee, before;/*
-    var date = new Date();
-    d = date.getDate();
-    m = date.getMonth() + 1;
-    y = date.getFullYear();
-
-    date = d + "." + m + "." + y;*/
     var date = moment().format("DD.MM.YYYY, HH:mm");
 
     fees = this.calcFees(amount, $("#gebühren").val());
@@ -38,6 +51,7 @@ var Helper = (function(){
     if(isPrivate) {
       fee = 0;
       amount /= 2;
+      amount = accounting.toFixed(amount, 0)*1;
       sum = before + amount;
     }
 
@@ -130,6 +144,8 @@ var Helper = (function(){
       fee: fee
     };
   }
+
+
 
   return Helper;
 })();
