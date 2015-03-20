@@ -182,6 +182,12 @@ var UI = (function(){
   r._isFieldHidden = function(){
     return this._field.hasClass("hidden");
   }
+  r._openPayOut = function() {
+
+    this._payOutField.val(this.AccManager.get("fume").getVal()/100);
+    $("#pay-out").toggleClass("hidden");
+
+  }
 
   r._initEvents = function(){
     var self = this;
@@ -199,6 +205,7 @@ var UI = (function(){
 
 
     this._payOutButton.click(this._onPayOutButton.bind(this));
+    this._openPayOutButton.click(this._openPayOut.bind(this));
 
 
     this._amountField.keyup(function(e){
@@ -258,6 +265,7 @@ var UI = (function(){
 
 
     this._payOutButton = $("#btn-pay-out");
+    this._openPayOutButton = $("#payoutButton");
     this._payOutField = $("#pay-out-input");
 
     this._usernameField.val(this.username());
