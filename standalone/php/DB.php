@@ -3,7 +3,7 @@
 
   DB::$db = new PDO("mysql:host=$HOST;dbname=$DB", $USER, $PW, [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ]);
 
-  DB::$ID = 1;
+  //DB::$ID = 1;
 
   class DB {
     static public $db;
