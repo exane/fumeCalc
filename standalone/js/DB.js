@@ -21,7 +21,7 @@ var DB = (function(){
   r._account = null;
   r._historyAsArray = null;
 
-  r.load = function(dataDB, accManager) {
+  r.load = function(dataDB, accManager){
     var self = this;
     $.ajax("php/ajaxController.php", {
       data: {
@@ -38,7 +38,7 @@ var DB = (function(){
     });
   }
 
-  r.save = function(saveObj, cb) {
+  r.save = function(saveObj, cb){
     this._account = saveObj.after;
     $.ajax("php/ajaxController.php", {
       type: "POST",
@@ -52,8 +52,22 @@ var DB = (function(){
     });
   }
 
+  r.payOut = function(payOutObj, cb){
+    $.ajax("php/ajaxController.php", {
+      type: "post",
+      data: {
+        payoutDB: true,
+        obj: payOutObj
+      }
+    })
+    .done(function(res){
+      cb(res);
+    });
+  }
+
 
   return DB;
-})();
+})
+();
 
 module.exports = DB;

@@ -7,3 +7,6 @@
   if(isset($_POST["saveDB"]) && $_POST["saveDB"] == true) {
     DB::save($_POST["obj"]);
   }
+  if(isset($_POST["payoutDB"]) && $_POST["payoutDB"] == true) {
+    DB::payOut($_POST["obj"]);
+  }

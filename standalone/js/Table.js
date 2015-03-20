@@ -1,4 +1,6 @@
 var $ = require("jquery");
+var AccManager = require("./AccountManager");
+var Helper = require("./Helper");
 
 var Table = (function(){
   var Table = function(obj = {}){
@@ -9,7 +11,7 @@ var Table = (function(){
      * constructor here
      */
 
-
+    this.AccManager = AccManager();
     this._data = obj;
     //this._addNewEntry(obj);
   };
@@ -25,17 +27,23 @@ var Table = (function(){
 
   r.$dataTable = $("#dataEntries");
 
+  r.AccManager = null;
+
   r._prepend = function(table) {
     this.$dataTable.prepend(table);
   }
+
 
   r.add = function(){
     var data = this._data;
     data.before = typeof data.before !== "undefined" ? data.before : data.account_before;
 
+    //this._checkPrivate();
+
     var before = data.before >= 0 ? data.before / 100 + "&euro;" : "<span class='red'>" + data.before / 100 + "&euro;" + "</span>";
     var deduction = data.deduction >= 0 ? data.deduction / 100 + "&euro;" : "<span class='red'>" + data.deduction / 100 + "&euro;" + "</span>";
     var after = data.after >= 0 ? data.after / 100 + "&euro;" : "<span class='red'>" + data.after / 100 + "&euro;" + "</span>";
+
 
     var table = this._table = $("<tr>" +
     "<td>" + data.date + "</td>" +

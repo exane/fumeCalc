@@ -66,6 +66,24 @@ var AccountManager = (function(){
     }
   }
 
+  r.calculate = function(obj){
+    var accs = this.get();
+    if(!obj.isPrivate){
+      accs["fume"].setVal(obj.after);
+      return;
+    }
+    var user = obj.signed;
+
+    //accs[user] += (obj.after - obj.before) / 2;
+    //accs[user].changeVal((obj.after - obj.before) / 2);
+    accs[user].changeVal(obj.deduction);
+    //accs[otheruser] -= (obj.after - obj.before) / 2;
+    //accs[otheruser].changeVal(-(obj.after - obj.before) / 2);
+
+    //accs["fume"].setVal(obj.after);
+    obj.isPrivate = user;
+  }
+
   return AccountManager;
 })();
 

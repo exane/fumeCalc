@@ -11,15 +11,16 @@ var Helper = (function(){
    */
   r.AccManager = AccManager();
 
-  r.parseSaveObj = function(){
+  r.parseSaveObj = function(isPrivate = false){
     var tmp = this.removePointAndComma($("#betrag").val());
     var amount = tmp * 1;
     var note = $("#bemerkung").val();
+    var signed = $("#username").val();
 
 
     var date = new Date();
     var d, m, y;
-    var fees, sum, fee;
+    var fees, sum, fee, before;
     d = date.getDate();
     m = date.getMonth() + 1;
     y = date.getFullYear();
@@ -30,6 +31,14 @@ var Helper = (function(){
     sum = (this.AccManager.get("fume").getVal() + fees.sum);
     fee = fees.fee;
 
+    before = this.AccManager.get(isPrivate?signed:"fume").getVal()
+
+    if(isPrivate) {
+      fee = 0;
+      amount /= 2;
+      sum = before + amount;
+    }
+
 
     if($("#customDate").val() !== ""){
       date = $("#customDate").val();
@@ -38,14 +47,15 @@ var Helper = (function(){
 
     var obj = {
       "date": date,
-      "before": this.AccManager.get("fume").getVal(),
+      "before": before,
       "deduction": amount,
       "fees": fee,
       "client": $("#kunde").val(),
-      "signed": $("#username").val(),
+      "signed": signed,
       "after": sum,
       "note": note,
-      "isPrivate": this.isPrivate()
+      "isPrivate": this.isPrivate(),
+      "accounts": this.AccManager.toFlatObj()
     }
 
     return obj;

@@ -25,9 +25,18 @@ var TablePreview = (function(){
   r._doNotPrependFlag = true;
 
   r.update = function() {
+    this._checkPrivate();
     this.add();
     this.$dataTable.html(this._table);
     return this;
+  }
+  r._checkPrivate = function() {
+    var data = this._data;
+    if(!data.isPrivate) return;
+    data.before = this.AccManager.get(data.signed).getVal();
+    data.deduction /= 2;
+    data.after = data.before + data.deduction;
+    data.fees = 0;
   }
 
 
