@@ -276,8 +276,9 @@ var UI = (function(){
       theme : 'metro-dark',
       ignoreCase: true,
       headerTemplate : '{content}{icon}',
+      dateFormat: "ddmmyyyy",
       headers: {
-        0: {sorter: "text"}
+        0: {sorter: "shortDate"}
       },
       sortList: [[0, 1]]
     });
