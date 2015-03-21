@@ -12,19 +12,19 @@ var Helper = (function(){
    * r.getProperty = function() {...}
    */
   r.AccManager = AccManager();
-  r.accounting = (function() {
+  r.accounting = (function(){
     accounting.settings = {
       currency: {
-        symbol : "€",   // default currency symbol is '$'
+        symbol: "€",   // default currency symbol is '$'
         format: "%v%s", // controls output: %s = symbol, %v = value/number (can be object: see below)
-        decimal : ",",  // decimal point separator
+        decimal: ",",  // decimal point separator
         thousand: ".",  // thousands separator
-        precision : 2   // decimal places
+        precision: 2   // decimal places
       },
       number: {
-        precision : 2,  // default precision on numbers is 0
+        precision: 2,  // default precision on numbers is 0
         thousand: ".",
-        decimal : ","
+        decimal: ","
       }
     }
     return accounting;
@@ -46,12 +46,12 @@ var Helper = (function(){
     sum = (this.AccManager.get("fume").getVal() + fees.sum);
     fee = fees.fee;
 
-    before = this.AccManager.get(isPrivate?signed:"fume").getVal()
+    before = this.AccManager.get(isPrivate ? signed : "fume").getVal()
 
-    if(isPrivate) {
+    if(isPrivate){
       fee = 0;
       amount /= 2;
-      amount = accounting.toFixed(amount, 0)*1;
+      amount = accounting.toFixed(amount, 0) * 1;
       sum = before + amount;
     }
 
@@ -145,6 +145,15 @@ var Helper = (function(){
     };
   }
 
+  r.getDeviceWidth = function(){
+    return (window.innerWidth > 0) ? window.innerWidth : screen.width;
+  }
+
+  r.device = {
+    sm: 768,
+    md: 992,
+    lg: 1200
+  }
 
 
   return Helper;

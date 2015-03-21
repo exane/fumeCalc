@@ -20,3 +20,11 @@
 .private-pay td {
   background: rgb(244, 244, 244);
 }
+
+.accountBlock {
+  min-width: 430px;
+}
+
+.row {
+  margin-bottom: 10px;
+}

@@ -97,6 +97,7 @@ var UI = (function(){
     var tim, vik, obj, self = this;
     var name = this.getUsername();
 
+
     if(amount > this.AccManager.get("fume").getVal()){
       this.displayWarningAlert("Input Error: number to large");
       return;
@@ -160,9 +161,17 @@ var UI = (function(){
 
   r._handleTableHeight = function(){
     var windowHeight = $(window).height();
-    var delta = 100;
+    var delta = 150;
+    var rowPadding = parseInt($(".row").css("padding-bottom"));
+    if(Helper.getDeviceWidth() < Helper.device.md){
+      delta += $(".menuButtonRow").height();
+    }
     if(!this._isFieldHidden()){
-      delta += 336;
+      //delta += 336;
+      delta += this._field.height() + rowPadding;
+    }
+    if(!this._isPayOutHidden()) {
+      delta += $("#pay-out").height() + rowPadding;
     }
     this._dataWrapper.height(windowHeight - delta);
   }
@@ -171,10 +180,16 @@ var UI = (function(){
     return this._field.hasClass("hidden");
   }
 
+  r._isPayOutHidden = function() {
+    return $("#pay-out").hasClass("hidden");
+  }
+
   r._openPayOut = function() {
 
     this._payOutField.val(this.AccManager.get("fume").getVal()/100);
     $("#pay-out").toggleClass("hidden");
+
+    this._handleTableHeight();
 
   }
 
@@ -340,6 +355,8 @@ var UI = (function(){
     sign.text(err);
     sign.show(400).delay(8000).hide(300);
   }
+
+
 
 
   return UI;
